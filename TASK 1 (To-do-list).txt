@@ -1,0 +1,101 @@
+TASK 1:
+
+ A To-Do List application is a useful project that helps users manage and organize their tasks efficiently. This project    aims to create a command-line or GUI-based application using Python, allowing users to create, update, and track their to-do lists.
+
+CODE:(code for task 1 to-do-list)
+import tkinter as tk
+from tkinter import messagebox
+
+class TodoApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("To-Do List App")
+
+        self.tasks = []
+
+        self.task_listbox = tk.Listbox(root, width=50)
+        self.task_listbox.pack(pady=10)
+
+        self.entry_task = tk.Entry(root, width=50)
+        self.entry_task.pack(pady=10)
+
+        self.priority_var = tk.StringVar(root)
+        self.priority_var.set("Low")
+        priorities = ["Low", "Medium", "High"]
+        self.priority_menu = tk.OptionMenu(root, self.priority_var, *priorities)
+        self.priority_menu.pack()
+
+        self.button_add = tk.Button(root, text="Add Task", command=self.add_task)
+        self.button_add.pack()
+
+        self.button_update = tk.Button(root, text="Update Task", command=self.update_task)
+        self.button_update.pack()
+
+        self.button_track = tk.Button(root, text="Track Completed", command=self.track_completed)
+        self.button_track.pack()
+
+        self.button_delete = tk.Button(root, text="Delete Task", command=self.delete_task)
+        self.button_delete.pack()
+
+        self.update_task_listbox()
+
+    def add_task(self):
+        task = self.entry_task.get()
+        priority = self.priority_var.get()
+        if task:
+            self.tasks.append({"task": task, "priority": priority, "completed": False})
+            self.update_task_listbox()
+            self.entry_task.delete(0, tk.END)
+        else:
+            messagebox.showwarning("Warning", "Task cannot be empty.")
+
+    def update_task(self):
+        try:
+            task_index = self.task_listbox.curselection()[0]
+            new_task = self.entry_task.get()
+            new_priority = self.priority_var.get()
+            if new_task:
+                self.tasks[task_index]["task"] = new_task
+                self.tasks[task_index]["priority"] = new_priority
+                self.update_task_listbox()
+                self.entry_task.delete(0, tk.END)
+            else:
+                messagebox.showwarning("Warning", "Task cannot be empty.")
+        except IndexError:
+            messagebox.showwarning("Warning", "Please select a task to update.")
+
+    def delete_task(self):
+        try:
+            task_index = self.task_listbox.curselection()[0]
+            del self.tasks[task_index]
+            self.update_task_listbox()
+        except IndexError:
+            messagebox.showwarning("Warning", "Please select a task to delete.")
+
+    def track_completed(self):
+        completed_tasks = [task["task"] for task in self.tasks if task["completed"]]
+        if completed_tasks:
+            messagebox.showinfo("Completed Tasks", "\n".join(completed_tasks))
+        else:
+            messagebox.showinfo("Completed Tasks", "No tasks completed yet.")
+
+    def update_task_listbox(self):
+        self.task_listbox.delete(0, tk.END)
+        for task in self.tasks:
+            task_str = f"{task['task']} - Priority: {task['priority']}"
+            if task['completed']:
+                task_str += " (Completed)"
+            self.task_listbox.insert(tk.END, task_str)
+
+    def mark_completed(self):
+        try:
+            task_index = self.task_listbox.curselection()[0]
+            self.tasks[task_index]["completed"] = True
+            self.update_task_listbox()
+        except IndexError:
+            messagebox.showwarning("Warning", "Please select a task to mark as completed.")
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = TodoApp(root)
+    root.mainloop()
