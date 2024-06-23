@@ -1,0 +1,117 @@
+TASK 2:
+ User Input: Prompt the user to choose rock, paper, or scissors.
+Computer Selection: Generate a random choice (rock, paper, or scissors) for the computer.
+Game Logic: Determine the winner based on the user's choice and the computer's choice.
+Rock beats scissors, scissors beat paper, and paper beats rock.
+Display Result: Show the user's choice and the computer's choice.
+Display the result, whether the user wins, loses, or it's a tie.
+Score Tracking (Optional): Keep track of the user's and computer's scores for multiple rounds.
+Play Again: Ask the user if they want to play another round.
+User Interface: Design a user-friendly interface with clear instructions and feedback.
+
+CODE(code for task 2 rock,paper,scissors):
+
+import tkinter as tk
+from tkinter import messagebox
+import random
+
+class RockPaperScissorsApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Rock, Paper, Scissors")
+        self.root.configure(bg="#f0f0f0")
+
+        self.choices = ["Rock", "Paper", "Scissors"]
+        self.user_score = 0
+        self.computer_score = 0
+
+        self.instructions_label = tk.Label(root, text="Choose Rock, Paper, or Scissors", fg="#333333", bg="#f0f0f0", font=("Helvetica", 14))
+        self.instructions_label.pack(pady=10)
+
+        self.max_points_label = tk.Label(root, text="Set Maximum Points:", fg="#333333", bg="#f0f0f0", font=("Helvetica", 12))
+        self.max_points_label.pack(pady=5)
+
+        self.max_points_entry = tk.Entry(root, bg="#ffffff", fg="#333333", insertbackground="#333333")
+        self.max_points_entry.pack(pady=5)
+        self.max_points_entry.insert(0, "5")  # Default max points to 5
+
+        self.buttons_frame = tk.Frame(root, bg="#f0f0f0")
+        self.buttons_frame.pack()
+
+        self.rock_button = tk.Button(self.buttons_frame, text="Rock", command=lambda: self.play("Rock"), bg="#add8e6", fg="#333333", width=10)
+        self.rock_button.grid(row=0, column=0, padx=10, pady=5)
+
+        self.paper_button = tk.Button(self.buttons_frame, text="Paper", command=lambda: self.play("Paper"), bg="#98fb98", fg="#333333", width=10)
+        self.paper_button.grid(row=0, column=1, padx=10, pady=5)
+
+        self.scissors_button = tk.Button(self.buttons_frame, text="Scissors", command=lambda: self.play("Scissors"), bg="#ffcccb", fg="#333333", width=10)
+        self.scissors_button.grid(row=0, column=2, padx=10, pady=5)
+
+        self.result_label = tk.Label(root, text="", fg="#333333", bg="#f0f0f0", font=("Helvetica", 12))
+        self.result_label.pack(pady=10)
+
+        self.score_label = tk.Label(root, text=f"User: {self.user_score}  Computer: {self.computer_score}", fg="#333333", bg="#f0f0f0", font=("Helvetica", 12))
+        self.score_label.pack(pady=10)
+
+        self.play_again_button = tk.Button(root, text="Play Again", command=self.reset_game, bg="#dcdcdc", fg="#333333", state=tk.DISABLED)
+        self.play_again_button.pack(pady=10)
+
+    def play(self, user_choice):
+        computer_choice = random.choice(self.choices)
+        result = self.determine_winner(user_choice, computer_choice)
+        self.update_score(result)
+        self.display_result(user_choice, computer_choice, result)
+        self.check_winner()
+
+    def determine_winner(self, user_choice, computer_choice):
+        if user_choice == computer_choice:
+            return "Tie"
+        elif (user_choice == "Rock" and computer_choice == "Scissors") or \
+             (user_choice == "Scissors" and computer_choice == "Paper") or \
+             (user_choice == "Paper" and computer_choice == "Rock"):
+            return "User"
+        else:
+            return "Computer"
+
+    def update_score(self, result):
+        if result == "User":
+            self.user_score += 1
+        elif result == "Computer":
+            self.computer_score += 1
+
+    def display_result(self, user_choice, computer_choice, result):
+        result_text = f"You chose {user_choice}. Computer chose {computer_choice}.\n"
+        if result == "Tie":
+            result_text += "It's a tie!"
+        elif result == "User":
+            result_text += "You win!"
+        else:
+            result_text += "You lose!"
+        self.result_label.config(text=result_text)
+        self.score_label.config(text=f"User: {self.user_score}  Computer: {self.computer_score}")
+
+    def check_winner(self):
+        try:
+            max_points = int(self.max_points_entry.get())
+        except ValueError:
+            messagebox.showwarning("Warning", "Please enter a valid number for maximum points.")
+            return
+
+        if self.user_score >= max_points:
+            messagebox.showinfo("Game Over", "You have reached the maximum points. You win!")
+            self.reset_game()
+        elif self.computer_score >= max_points:
+            messagebox.showinfo("Game Over", "Computer has reached the maximum points. You lose!")
+            self.reset_game()
+
+    def reset_game(self):
+        self.user_score = 0
+        self.computer_score = 0
+        self.result_label.config(text="")
+        self.score_label.config(text=f"User: {self.user_score}  Computer: {self.computer_score}")
+        self.play_again_button.config(state=tk.DISABLED)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = RockPaperScissorsApp(root)
+    root.mainloop()
